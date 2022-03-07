@@ -1,7 +1,7 @@
 /*
  * Copyright © 2001-2013 Stéphane Raimbault <stephane.raimbault@gmail.com>
  *
- * SPDX-License-Identifier: LGPL-2.1+
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #if defined(_WIN32)
@@ -154,7 +154,7 @@ static int _modbus_tcp_prepare_response_tid(const uint8_t *req, int *req_length)
 
 static int _modbus_tcp_send_msg_pre(uint8_t *req, int req_length)
 {
-    /* Substract the header length to the message length */
+    /* Subtract the header length to the message length */
     int mbap_length = req_length - 6;
 
     req[4] = mbap_length >> 8;
@@ -481,6 +481,7 @@ int modbus_tcp_listen(modbus_t *ctx, int nb_connection)
 {
     int new_s;
     int enable;
+    int flags;
     struct sockaddr_in addr;
     modbus_tcp_t *ctx_tcp;
 
@@ -497,7 +498,13 @@ int modbus_tcp_listen(modbus_t *ctx, int nb_connection)
     }
 #endif
 
-    new_s = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+    flags = SOCK_STREAM;
+
+#ifdef SOCK_CLOEXEC
+    flags |= SOCK_CLOEXEC;
+#endif
+
+    new_s = socket(PF_INET, flags, IPPROTO_TCP);
     if (new_s == -1) {
         return -1;
     }
@@ -593,10 +600,14 @@ int modbus_tcp_pi_listen(modbus_t *ctx, int nb_connection)
 
     new_s = -1;
     for (ai_ptr = ai_list; ai_ptr != NULL; ai_ptr = ai_ptr->ai_next) {
+        int flags = ai_ptr->ai_socktype;
         int s;
 
-        s = socket(ai_ptr->ai_family, ai_ptr->ai_socktype,
-                   ai_ptr->ai_protocol);
+#ifdef SOCK_CLOEXEC
+        flags |= SOCK_CLOEXEC;
+#endif
+
+        s = socket(ai_ptr->ai_family, flags, ai_ptr->ai_protocol);
         if (s < 0) {
             if (ctx->debug) {
                 perror("socket");
@@ -894,7 +905,7 @@ modbus_t* modbus_new_tcp_pi(const char *node, const char *service)
         dest_size = sizeof(char) * _MODBUS_TCP_PI_SERVICE_LENGTH;
         ret_size = strlcpy(ctx_tcp_pi->service, service, dest_size);
     } else {
-        /* Empty service is not allowed, error catched below. */
+        /* Empty service is not allowed, error caught below. */
         ret_size = 0;
     }
 
