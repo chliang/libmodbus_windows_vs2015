@@ -26,14 +26,14 @@
 #define LIBMODBUS_VERSION_MINOR (1)
 
 /* The micro version (3, if %LIBMODBUS_VERSION is 1.2.3) */
-#define LIBMODBUS_VERSION_MICRO (7)
+#define LIBMODBUS_VERSION_MICRO (10)
 
 /* The full version, like 1.2.3 */
-#define LIBMODBUS_VERSION        3.1.7
+#define LIBMODBUS_VERSION        3.1.10
 
 /* The full version, in string form (suited for string concatenation)
  */
-#define LIBMODBUS_VERSION_STRING "3.1.7"
+#define LIBMODBUS_VERSION_STRING "3.1.10"
 
 /* Numerically encoded version, eg. v1.2.3 is 0x010203 */
 #define LIBMODBUS_VERSION_HEX ((LIBMODBUS_VERSION_MAJOR << 16) |  \
